@@ -14,8 +14,15 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends AppCompatActivity {
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_6455;
+import org.java_websocket.handshake.ServerHandshake;
 
+import java.net.URI;
+
+public class MainActivity extends AppCompatActivity {
+    private WebSocketClient cc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,32 +37,75 @@ public class MainActivity extends AppCompatActivity {
         String user = "admin";
         String passwd = "1234";
 
+
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
                 Boolean error = false;
+                String text="";
+                if ((userInput.getText().toString()).length()>0 && (passInput.getText().toString()).length()>0 && (ipInput.getText().toString()).length()>0 ) {
+                    String location="ws://";
+                    location+=ipInput.getText().toString();
+                    location+=":8888";
 
-                if (!user.equals(userInput.getText().toString()) ) {
-                    String text = "User or password is incorrect";
-                    error = message(text);
+                    try {
+
+                        cc = new WebSocketClient(new URI(location), (Draft) new Draft_6455()) {
+                            @Override
+                            public void onMessage(String message) {
+                                if(message.equalsIgnoreCase("OK")){
+                                    Intent newMain = new Intent(MainActivity.this,ieti_industry.class);
+                                    startActivity(newMain);
+
+                                }else if(message.equalsIgnoreCase("ERROR")){
+                                    messagePop("Credenciales incorrectas (user/password)");
+                                }
+
+                            }
+
+                            @Override
+                            public void onOpen(ServerHandshake handshake) {
+                                cc.send(userInput.getText().toString()+"&"+passInput.getText().toString());
+                                messagePop("CONECTADO");
+                                ipInput.setEnabled(false);
+
+                            }
+
+                            @Override
+                            public void onClose(int code, String reason, boolean remote) {
+                                ipInput.setEnabled(true);
+                                //messagePop("Cerrando!");
+                            }
+
+                            @Override
+                            public void onError(Exception ex) {
+                                ipInput.setEnabled(true);
+                                messagePop(" "+ex);
+                                Log.i("i",""+ex);
+
+                            }
+                        };
+                        cc.connect();
+                    }catch (java.net.URISyntaxException e){
+                        error=true;
+                        messagePop("ERROR CONEX");
+                    }
+                    //si falla:
+                     text = "User or password is incorrect";
                     userInput.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-
-                }
-                if (!passwd.equals(passInput.getText().toString())) {
-                    String text = "User or password is incorrect";
-                    error = message(text);
                     passInput.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                }else{
+                    //POP UP de rellene
+                     text = "Todos los campos son obligatorios";
+                     error=true;
+                    //message(text);
                 }
 
-                if (ipInput.getText().toString().equals("")) {
-                    String text = "Server IP is null!";
-                    error = message(text);
-                    ipInput.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-                }
+                if (error) {
 
-                if (!error) {
-                    Intent newMain = new Intent(MainActivity.this,ieti_industry.class);
-                    startActivity(newMain);
+
+                    messagePop(text);
+
                 }
 
             }
@@ -64,9 +114,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public Boolean message(String text) {
+    public Boolean messagePop(String text) {
         Snackbar sbMsg = Snackbar.make(findViewById(R.id.constraintLayout),text,3000);
         sbMsg.show();
         return true;
     };
+
+
+
+
 }
