@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -79,6 +81,16 @@ public class ieti_industry extends AppCompatActivity {
             newMain.putExtra("data","CONNECTION ERROR");
             startActivity(newMain);
         }
+
+        // EVENT LISTENER LOGOUT BUTTON
+        Button buttonLogout=findViewById(R.id.logout);
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cc.close();
+            }
+        });
+
 
     }
 
