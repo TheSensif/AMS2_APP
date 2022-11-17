@@ -33,9 +33,10 @@ public class MainActivity extends AppCompatActivity {
         EditText passInput = findViewById(R.id.editPassword);
         EditText ipInput = findViewById(R.id.editServerIp);
 
-
-        String user = "admin";
-        String passwd = "1234";
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            messagePop(extras.getString("data"));
+        }
 
 
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
@@ -50,12 +51,17 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
 
-                        cc = new WebSocketClient(new URI(location), (Draft) new Draft_6455()) {
+                        String finalLocation = location;
+                        cc = new WebSocketClient(new URI(finalLocation), (Draft) new Draft_6455()) {
                             @Override
                             public void onMessage(String message) {
                                 if(message.equalsIgnoreCase("OK")){
                                     Intent newMain = new Intent(MainActivity.this,ieti_industry.class);
+                                    newMain.putExtra("user",userInput.getText().toString());
+                                    newMain.putExtra("password",passInput.getText().toString());
+                                    newMain.putExtra("ip", finalLocation);
                                     startActivity(newMain);
+                                    cc.close();
 
                                 }else if(message.equalsIgnoreCase("ERROR")){
                                     messagePop("Credenciales incorrectas (user/password)");
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onError(Exception ex) {
                                 ipInput.setEnabled(true);
-                                messagePop(" "+ex);
+                                //messagePop(" "+ex);
                                 Log.i("i",""+ex);
 
                             }
