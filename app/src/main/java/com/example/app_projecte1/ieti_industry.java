@@ -5,18 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import org.json.JSONArray;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ieti_industry extends AppCompatActivity {
 
 
-    String texto = "{0=DataModule{switch, id='0', defaul='on', name='Label'}, " +
-            "1=DataModule{slider, id='1, defaul='4.5', min=0, max=10, step='0.5'}, " +
-            "2=DataModule{dropdown', id='2', defaul='3', value={2=Label 2, 3=Label 3, 5=Label 5, 6=Label 4}}, " +
-            "3=DataModule{etiqueta='sensor', id='3', units='ºC', thresholdlow=5, thresholdhigh=10, name='Label'}}";
 
     
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,5 +31,32 @@ public class ieti_industry extends AppCompatActivity {
         /*for (int i = 0; i < components.size(); i++) {
             if (components.get())
         }*/
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset());
+            System.out.println(obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public String loadJSONFromAsset() {
+        String json = "";
+        try {
+            //We create a InputStream to get the Json file with the components
+            InputStream is = getAssets().open("components.json");
+            //We will check about its length
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            //We read the data on the buffer
+            is.read(buffer);
+            is.close();
+            //And we will add the buffer data to the String json
+            json = new String(buffer,"UTF-8");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 }
