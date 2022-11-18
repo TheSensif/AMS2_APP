@@ -65,15 +65,17 @@ public class MainActivity extends AppCompatActivity {
 
                                 }else if(message.equalsIgnoreCase("ERROR")){
                                     messagePop("Credenciales incorrectas (user/password)");
+                                    cc.close();
                                 }
 
                             }
 
                             @Override
                             public void onOpen(ServerHandshake handshake) {
-                                cc.send(userInput.getText().toString()+"&"+passInput.getText().toString());
                                 messagePop("CONECTADO");
-                                ipInput.setEnabled(false);
+                                cc.send(userInput.getText().toString()+"&"+passInput.getText().toString());
+
+
 
                             }
 
