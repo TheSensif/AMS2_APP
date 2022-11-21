@@ -14,6 +14,9 @@ import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import android.widget.ArrayAdapter;
@@ -37,6 +40,7 @@ import java.util.List;
 public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
     private WebSocketClient cc;
+    private JSONObject json;
     ArrayList<String> components = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +76,16 @@ public class ieti_industry extends AppCompatActivity {
 
                 @Override
                 public void onMessage(ByteBuffer message){
+
                     Log.i("i","Taking the configuration");
+                    String temp=bytesToObject(message);
+
+                    try {
+                        json=new JSONObject(temp);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("infoJson", String.valueOf(json));
                 }
 
                 @Override
@@ -111,7 +124,7 @@ public class ieti_industry extends AppCompatActivity {
         });
 
         try {
-            JSONObject obj = new JSONObject(loadJSONFromAsset());
+            JSONObject obj = json;
             System.out.println(obj);
             int quantityElements = obj.length();
 
@@ -142,9 +155,6 @@ public class ieti_industry extends AppCompatActivity {
                                 namesSwitch.add(stringIterator.next());
                             }
                         }
-
-                        //todo CREAR UN NUEVO COMPONENTE PARA EL MOVIL
-
 
                         //tableRow.addView(textView);
                         ToggleButton tb = new ToggleButton(this);
@@ -273,7 +283,7 @@ public class ieti_industry extends AppCompatActivity {
 
     }
 
-    public String loadJSONFromAsset() {
+    /*public String loadJSONFromAsset() {
         String json = "";
         try {
             //We create a InputStream to get the Json file with the components
@@ -293,6 +303,23 @@ public class ieti_industry extends AppCompatActivity {
         return json;
 
 
+    }*/
+    public String bytesToObject (ByteBuffer arr) {
+        String result = "error";
+        try {
+            // Transforma el ByteButter en byte[]
+            byte[] bytesArray = new byte[arr.remaining()];
+            arr.get(bytesArray, 0, bytesArray.length);
+
+            // Transforma l'array de bytes en objecte
+            ByteArrayInputStream in = new ByteArrayInputStream(bytesArray);
+            ObjectInputStream is = new ObjectInputStream(in);
+            return (String) is.readObject();
+
+        } catch (ClassNotFoundException e) { e.printStackTrace();
+        } catch (UnsupportedEncodingException e) { e.printStackTrace();
+        } catch (IOException e) { e.printStackTrace(); }
+        return result;
     }
 
 
