@@ -1,0 +1,36 @@
+{
+    "switch": [
+
+        {
+            "idElement": "0",
+            "default": "on",
+            "name": "Label"
+        }
+    ],
+    "slider": [
+      {
+        "idElement": "1",
+        "default": "4.5 ",
+        "min": "0",
+        "max": "10",
+        "step": "0.5"
+    }
+    ],
+    "dropdown": [{
+        "idElement": "2",
+        "default": "3",
+        "label": "etiqueta",
+        "value": {
+            "2": "Label 2",
+            "3": "Label 3",
+            "5": "Label 5"
+        }
+    }],
+    "sensor": [{
+        "idElement": "3",
+        "units": "ºC",
+        "thresholdlow": "5",
+        "thresholdhigh": "10",
+        "name": "Label"
+    }]
+}
