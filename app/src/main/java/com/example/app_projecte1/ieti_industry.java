@@ -12,6 +12,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
@@ -67,7 +69,16 @@ public class ieti_industry extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.i("infoJson", String.valueOf(json));
+                    try {
+                        
+                        Log.i("infoJson", String.valueOf(json.get("slider")));
+                        JSONArray arr = json.getJSONArray("slider");
+                        for(int i = 0; i < arr.length(); i++){
+                            System.out.println(arr.getJSONObject(i).getString("default"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
