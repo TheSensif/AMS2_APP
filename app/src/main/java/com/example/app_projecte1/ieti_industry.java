@@ -2,7 +2,6 @@ package com.example.app_projecte1;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-<<<<<<< HEAD
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -98,7 +97,7 @@ public class ieti_industry extends AppCompatActivity {
 
 
 }
-=======
+/*
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
@@ -136,15 +135,9 @@ public class ieti_industry extends AppCompatActivity {
         setContentView(R.layout.activity_ieti_industry);
         TableLayout mainTable = findViewById(R.id.tableLayout);
         ArrayList<String> components = new ArrayList<>();
-        /*ArrayList<String> arraySliders = new ArrayList<>();
-        ArrayList<String> arraySwitch = new ArrayList<>();
-        ArrayList<String> arrayDropDown = new ArrayList<>();
-        ArrayList<String> arraySensor = new ArrayList<>();*/
 
 
-        /*for (int i = 0; i < components.size(); i++) {
-            if (components.get())
-        }*/
+
         try {
             JSONObject obj = new JSONObject(loadJSONFromAsset());
             System.out.println(obj);
@@ -192,12 +185,7 @@ public class ieti_industry extends AppCompatActivity {
                         tb.setTextOff("OFF");
                         System.out.println(namesSwitch.get(2));
                         tb.setTextOn((CharSequence) switchObj.get(namesSwitch.get(2)));
-                        /*if (tableRow.getParent() != null) {
-                            ((ViewGroup)tableRow.getParent()).removeView(tableRow);
-                        }
-                        if (mainTable.getParent() != null) {
-                            ((ViewGroup)mainTable.getParent()).removeView(mainTable);
-                        }*/
+
                         tableRow.addView(tb);
                         mainTable.addView(tableRow);
                         //Slider sld = new Slider(this,);
@@ -229,12 +217,7 @@ public class ieti_industry extends AppCompatActivity {
                         //Setting the stepsize and the value of the slider
                         slid.setStepSize(Float.valueOf((String) sliderObj.get(namesSlider.get(4))));
                         slid.setValue(val);
-                        /*if (tableRow.getParent() != null) {
-                            ((ViewGroup)tableRow.getParent()).removeView(tableRow);
-                        }
-                        if (mainTable.getParent() != null) {
-                            ((ViewGroup)mainTable.getParent()).removeView(mainTable);
-                        }*/
+
                         tableRow.addView(slid);
                         mainTable.addView(tableRow);
                     }
@@ -280,12 +263,7 @@ public class ieti_industry extends AppCompatActivity {
                         //todo Para conseguir la posicion por defecto, tendiramos que recorrer otra vez el objeto
                         //todo para buscar la posicion exacta en la que se encuentra el objeto y luego indicarle eso al setSelection
                         //dropdown.setSelection();
-                        /*if (tableRow.getParent() != null) {
-                            ((ViewGroup)tableRow.getParent()).removeView(tableRow);
-                        }
-                        if (mainTable.getParent() != null) {
-                            ((ViewGroup)mainTable.getParent()).removeView(mainTable);
-                        }*/
+
                         tableRow.addView(dropdown);
                         mainTable.addView(tableRow);
                     }
@@ -310,12 +288,7 @@ public class ieti_industry extends AppCompatActivity {
                         sensorText.append((CharSequence) sensorObj.get(namesSensor.get(2)));
                         sensorText.append("\n"+"Threshold High: ");
                         sensorText.append((CharSequence) sensorObj.get(namesSensor.get(3)));
-                        /*if (tableRow.getParent() != null) {
-                            ((ViewGroup)tableRow.getParent()).removeView(tableRow);
-                        }
-                        if (mainTable.getParent() != null) {
-                            ((ViewGroup)mainTable.getParent()).removeView(mainTable);
-                        }*/
+
                         tableRow.addView(sensorText);
                         mainTable.addView(tableRow);
 
@@ -348,4 +321,6 @@ public class ieti_industry extends AppCompatActivity {
         return json;
     }
 }
->>>>>>> origin/feature/components
+*/
+
+
