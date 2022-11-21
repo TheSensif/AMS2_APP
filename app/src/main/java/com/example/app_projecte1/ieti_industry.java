@@ -8,19 +8,24 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 
 public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
     private WebSocketClient cc;
+    private JSONObject json=new JSONObject();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +58,23 @@ public class ieti_industry extends AppCompatActivity {
 
                 @Override
                 public void onMessage(ByteBuffer message){
+
                     Log.i("i","Taking the configuration");
+                    String temp=bytesToObject(message);
+
+                    try {
+                        json=new JSONObject(temp);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("infoJson", String.valueOf(json));
                 }
 
                 @Override
                 public void onOpen(ServerHandshake handshake) {
                     cc.send(user+"&"+password);
                     Log.i("i","OPEN");
+
                 }
 
                 @Override
@@ -76,6 +91,7 @@ public class ieti_industry extends AppCompatActivity {
                 }
             };
             cc.connect();
+
         }catch (java.net.URISyntaxException e){
             Intent newMain = new Intent(ieti_industry.this,MainActivity.class);
             newMain.putExtra("data","CONNECTION ERROR");
@@ -93,10 +109,30 @@ public class ieti_industry extends AppCompatActivity {
 
 
     }
+    public String bytesToObject (ByteBuffer arr) {
+        String result = "error";
+        try {
+            // Transforma el ByteButter en byte[]
+            byte[] bytesArray = new byte[arr.remaining()];
+            arr.get(bytesArray, 0, bytesArray.length);
+
+            // Transforma l'array de bytes en objecte
+            ByteArrayInputStream in = new ByteArrayInputStream(bytesArray);
+            ObjectInputStream is = new ObjectInputStream(in);
+            return (String) is.readObject();
+
+        } catch (ClassNotFoundException e) { e.printStackTrace();
+        } catch (UnsupportedEncodingException e) { e.printStackTrace();
+        } catch (IOException e) { e.printStackTrace(); }
+        return result;
+    }
 
 
 
 }
+
+// TODO when create a component set onchange listener and send json with id and new value , send via byte buffer
+
 /*
 import android.annotation.SuppressLint;
 import android.content.Context;
