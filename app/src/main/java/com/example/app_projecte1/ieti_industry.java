@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.android.material.snackbar.Snackbar;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -17,20 +16,40 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
+import com.google.android.material.slider.Slider;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
     private WebSocketClient cc;
+    ArrayList<String> components = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ieti_industry);
+        TableLayout mainTable = findViewById(R.id.tableLayout);
+
         //get the values passed :
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-             user = extras.getString("user");
-             password = extras.getString("password");
-             ip = extras.getString("ip");
+            user = extras.getString("user");
+            password = extras.getString("password");
+            ip = extras.getString("ip");
         }
         // connection block:
         try {
@@ -90,53 +109,6 @@ public class ieti_industry extends AppCompatActivity {
                 cc.close();
             }
         });
-
-
-    }
-
-
-
-}
-/*
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ToggleButton;
-
-import com.google.android.material.slider.Slider;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-public class ieti_industry extends AppCompatActivity {
-
-
-
-    
-    @SuppressLint("ResourceType")
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ieti_industry);
-        TableLayout mainTable = findViewById(R.id.tableLayout);
-        ArrayList<String> components = new ArrayList<>();
-
-
 
         try {
             JSONObject obj = new JSONObject(loadJSONFromAsset());
@@ -294,14 +266,14 @@ public class ieti_industry extends AppCompatActivity {
 
                     }
                 }
-                        }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
 
-        public String loadJSONFromAsset() {
+    public String loadJSONFromAsset() {
         String json = "";
         try {
             //We create a InputStream to get the Json file with the components
@@ -319,8 +291,12 @@ public class ieti_industry extends AppCompatActivity {
             e.printStackTrace();
         }
         return json;
+
+
     }
+
+
+
 }
-*/
 
 
