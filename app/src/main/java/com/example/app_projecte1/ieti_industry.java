@@ -1,11 +1,30 @@
 package com.example.app_projecte1;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import com.google.android.material.slider.Slider;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import android.content.Intent;
+import android.util.Log;
 import android.widget.Button;
 
 import org.java_websocket.client.WebSocketClient;
@@ -28,10 +47,14 @@ public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
     private WebSocketClient cc;
     private JSONObject json=new JSONObject();
+    private boolean messageSended = false;
+    private TableLayout mainTable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ieti_industry);
+        mainTable = findViewById(R.id.tableLayout);
+        ArrayList<String> components = new ArrayList<>();
         //get the values passed :
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -66,6 +89,9 @@ public class ieti_industry extends AppCompatActivity {
 
                     try {
                         json=new JSONObject(temp);
+                        System.out.println(json);
+                        messageSended = true;
+                        prueba();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -119,7 +145,221 @@ public class ieti_industry extends AppCompatActivity {
         });
 
 
+
     }
+    public void prueba() {
+        try {
+                JSONObject obj = json;
+                System.out.println(obj);
+                int quantityElements = obj.length();
+
+                List<String> namesList = new ArrayList<>();
+                Iterator<String> stringIterator = obj.keys();
+                while (stringIterator.hasNext()) {
+                    namesList.add(stringIterator.next());
+                }
+                for (int i = 0; i < quantityElements; i++) {
+                    TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+
+                    TableRow tableRow = new TableRow(this);
+                    tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
+
+                    TextView textView = new TextView(this);
+                    textView.setLayoutParams(rowParams);// TableRow is the parent view
+                    if (namesList.get(i).equals("switch")) {
+                        JSONArray arrayData = obj.getJSONArray("switch");
+                        List<String> namesSwitch = new ArrayList<>();
+                        for (int j = 0; j < arrayData.length(); j++) {
+                            JSONObject switchObj = arrayData.getJSONObject(j);
+                            if (j == 0) {
+                                stringIterator = switchObj.keys();
+                                while (stringIterator.hasNext()) {
+                                    namesSwitch.add(stringIterator.next());
+                                }
+                            }
+
+                            //todo CREAR UN NUEVO COMPONENTE PARA EL MOVIL
+
+
+                            //tableRow.addView(textView);
+                            ToggleButton tb = new ToggleButton(this);
+                            tb.setId((Integer) switchObj.get(namesSwitch.get(2)));
+                            Boolean activated = true;
+
+
+                            tb.setTextOff("OFF");
+                            //System.out.println(namesSwitch.get(2));
+                            tb.setTextOn((CharSequence) switchObj.get(namesSwitch.get(1)));
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        if (switchObj.get(namesSwitch.get(0)) == activated) {
+                                            tb.setChecked(true);
+                                        } else {
+                                            tb.setChecked(false);
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    tableRow.addView(tb);
+                                    mainTable.addView(tableRow);
+                                    // Stuff that updates the UI
+
+                                }
+                            });
+
+
+                            //Slider sld = new Slider(this,);
+
+                        }
+                    } else if (namesList.get(i).equals("slider")) {
+                        JSONArray arrayData = obj.getJSONArray("slider");
+                        List<String> namesSlider = new ArrayList<>();
+                        for (int j = 0; j < arrayData.length(); j++) {
+                            JSONObject sliderObj = arrayData.getJSONObject(j);
+                            if (j == 0) {
+                                stringIterator = sliderObj.keys();
+                                while (stringIterator.hasNext()) {
+                                    namesSlider.add(stringIterator.next());
+                                }
+                            }
+                            //tableRow.addView(textView);
+                            Slider slid = new Slider(this);
+
+                            slid.setId(Integer.valueOf(String.valueOf(sliderObj.get(namesSlider.get(4)))));
+                            //Initial data
+
+                            slid.setValueFrom(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(1)))));
+                            //slid.setValueFrom(0);
+
+                            //Final data
+                            slid.setValueTo(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(2)))));
+                            //slid.setValueTo(10);
+
+                            //Setting the stepsize and the value of the slider
+                            slid.setStepSize(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(3)))));
+                            //slid.setStepSize(0.5F);
+
+                            slid.setValue(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(0)))));
+
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tableRow.addView(slid);
+                                    mainTable.addView(tableRow);
+                                    // Stuff that updates the UI
+
+                                }
+                            });
+                        }
+
+
+                    } else if (namesList.get(i).equals("dropdown")) {
+                        JSONArray arrayData = obj.getJSONArray("dropdown");
+                        List<String> nameDropDown = new ArrayList<>();
+
+                        for (int j = 0; j < arrayData.length(); j++) {
+
+                            JSONObject dropdownObj = arrayData.getJSONObject(j);
+                            if (j == 0) {
+                                stringIterator = dropdownObj.keys();
+                                while (stringIterator.hasNext()) {
+                                    nameDropDown.add(stringIterator.next());
+                                }
+                            }
+
+                            Spinner dropdown = new Spinner(this);
+
+                            //Getting new data for the spinner
+                            JSONArray spinnerLabels = dropdownObj.getJSONArray("values");
+                            dropdown.setId(Integer.valueOf(String.valueOf(dropdownObj.get(nameDropDown.get(2)))));
+
+                            List<String> labelIds = new ArrayList<>();
+                            List<String> labelInfo = new ArrayList<>();
+
+                            //Get LabelIds
+                            /*stringIterator = spinnerLabels.getJSONObject("values");
+                            while (stringIterator.hasNext()) {
+                                labelIds.add(stringIterator.next());
+                            }*/
+
+                            for (int k = 0; k < spinnerLabels.length(); k++) {
+                                JSONObject label = spinnerLabels.getJSONObject(k);
+                                stringIterator = label.keys();
+                                while (stringIterator.hasNext()) {
+                                    labelIds.add(stringIterator.next());
+                                    labelInfo.add((String) label.get((labelIds.get(k))));
+
+                                }
+                            }
+
+                            //Get the actual labels to create the array
+                            /*for (int k = 0; k < labelIds.size(); k++) {
+                                labelInfo.add((String) spinnerLabels.get(labelIds.get(k)));
+                            }*/
+                            String[] spinnerOpt = labelInfo.toArray(new String[0]);
+                            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                                    android.R.layout.simple_spinner_item, spinnerOpt);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+                            dropdown.setAdapter(adapter);
+                            //todo Para conseguir la posicion por defecto, tendiramos que recorrer otra vez el objeto
+                            //todo para buscar la posicion exacta en la que se encuentra el objeto y luego indicarle eso al setSelection
+                            //dropdown.setSelection();
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tableRow.addView(dropdown);
+                                    mainTable.addView(tableRow);
+                                    // Stuff that updates the UI
+
+                                }
+                            });
+                        }
+                    } else if (namesList.get(i).equals("sensor")) {
+                        JSONArray arrayData = obj.getJSONArray("sensor");
+                        List<String> namesSensor = new ArrayList<>();
+
+                        for (int j = 0; j < arrayData.length(); j++) {
+                            JSONObject sensorObj = arrayData.getJSONObject(j);
+                            if (j == 0) {
+                                stringIterator = sensorObj.keys();
+                                while (stringIterator.hasNext()) {
+                                    namesSensor.add(stringIterator.next());
+                                }
+                            }
+                            //tableRow.addView(textView);
+                            TextView sensorText = new TextView(this);
+                            //Adding basic information to the TextView that will be shown
+                            sensorText.setText((CharSequence) sensorObj.get(namesSensor.get(2)));
+                            sensorText.setId(Integer.valueOf(String.valueOf(sensorObj.get(namesSensor.get(1)))));
+                            sensorText.append("\n" + "Threshhold Low: ");
+                            sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(3))));
+                            sensorText.append("\n" + "Threshold High: ");
+                            sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(0))));
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tableRow.addView(sensorText);
+                                    mainTable.addView(tableRow);
+                                    // Stuff that updates the UI
+
+                                }
+                            });
+
+                        }
+                    }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public String bytesToObject (ByteBuffer arr) {
         String result = "error";
         try {
