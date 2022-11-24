@@ -19,7 +19,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -67,7 +69,7 @@ public class ieti_industry extends AppCompatActivity {
             cc = new WebSocketClient(new URI(ip), (Draft) new Draft_6455()) {
                 @Override
                 public void onMessage(String message) {
-                    // TODO Put the json translator
+
                     Log.i("e",message);
                     if(message.equalsIgnoreCase("ERROR")){
                         cc.close();
@@ -82,26 +84,39 @@ public class ieti_industry extends AppCompatActivity {
                 @Override
                 public void onMessage(ByteBuffer message){
 
-                    Log.i("i","Taking the configuration");
-                    String temp=bytesToObject(message);
+                    if(messageSended==false){
+                        Log.i("i","Taking the configuration");
+                        String temp=bytesToObject(message);
 
-                    try {
-                        json=new JSONObject(temp);
-                        System.out.println(json);
-                        messageSended = true;
-                        prueba();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        
-                        Log.i("infoJson", String.valueOf(json.get("slider")));
-                        JSONArray arr = json.getJSONArray("slider");
-                        for(int i = 0; i < arr.length(); i++){
-                            System.out.println(arr.getJSONObject(i).getString("default"));
+                        try {
+                            json=new JSONObject(temp);
+                            System.out.println(json);
+                            messageSended = true;
+                            prueba();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        try {
+
+                            Log.i("infoJson", String.valueOf(json.get("slider")));
+                            JSONArray arr = json.getJSONArray("slider");
+                            for(int i = 0; i < arr.length(); i++){
+                                System.out.println(arr.getJSONObject(i).getString("default"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        // TODO put here the value changer
+                        String temp=bytesToObject(message);
+
+                        try {
+                            json=new JSONObject(temp);
+                            System.out.println(json);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -205,6 +220,22 @@ public class ieti_industry extends AppCompatActivity {
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
+
+                                    tb.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            // TODO TEST MORE
+                                            try {
+                                                switchObj.put("default",tb.isChecked());
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            System.out.println(switchObj);
+
+                                            cc.send(jsonToBytes(switchObj));
+                                        }
+                                    });
+
                                     tableRow.addView(tb);
                                     mainTable.addView(tableRow);
                                     // Stuff that updates the UI
@@ -397,6 +428,18 @@ public class ieti_industry extends AppCompatActivity {
 
         } catch (ClassNotFoundException e) { e.printStackTrace();
         } catch (UnsupportedEncodingException e) { e.printStackTrace();
+        } catch (IOException e) { e.printStackTrace(); }
+        return result;
+    }
+    public static byte[] jsonToBytes (JSONObject obj) {
+        byte[] result = null;
+        try {
+            // Transforma l'objecte a bytes[]
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(obj.toString());
+            oos.flush();
+            result = bos.toByteArray();
         } catch (IOException e) { e.printStackTrace(); }
         return result;
     }
