@@ -1,6 +1,8 @@
 package com.example.app_projecte1;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,13 +92,12 @@ public class ieti_industry extends AppCompatActivity {
 
                         try {
                             json=new JSONObject(temp);
-                            System.out.println(json);
                             messageSended = true;
                             prueba();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        try {
+                        /*try {
 
                             Log.i("infoJson", String.valueOf(json.get("slider")));
                             JSONArray arr = json.getJSONArray("slider");
@@ -105,7 +106,7 @@ public class ieti_industry extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     }else{
                         // TODO put here the value changer
                         String temp=bytesToObject(message);
@@ -113,7 +114,6 @@ public class ieti_industry extends AppCompatActivity {
                         try {
                             json=new JSONObject(temp);
                             System.out.println(json);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -164,247 +164,272 @@ public class ieti_industry extends AppCompatActivity {
         try {
 
             JSONObject obj = json;
-                System.out.println(obj);
+                System.out.println("JSON OBJECT"+obj);
                 int quantityElements = obj.length();
-
-                List<String> namesList = new ArrayList<>();
+                System.out.println(quantityElements);
+                List<String> blockList = new ArrayList<>();
                 Iterator<String> stringIterator = obj.keys();
                 while (stringIterator.hasNext()) {
-                    namesList.add(stringIterator.next());
+                    blockList.add(stringIterator.next());
                 }
                 for (int i = 0; i < quantityElements; i++) {
-                    TableLayout mainTable = findViewById(R.id.tableLayout);
 
-                    TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                    //CONSEGUIR EL TIPO DE ARRAY Y EL OBJETO
+                    System.out.println(obj.get(blockList.get(i)));
+                    JSONArray blockArray = (JSONArray) obj.get(blockList.get(i));
+                    JSONObject blockObject = blockArray.getJSONObject(0);
+
+                    for (int j = 0; j < blockObject.length(); j++) {
+                        List<String> namesList = new ArrayList<>();
+                        stringIterator = blockObject.keys();
+                        while (stringIterator.hasNext()) {
+                            namesList.add(stringIterator.next());
+                        }
+
+                        //todo Crear un objeto que sea segun el bloque en lugar de intentar recorrer el bloque
 
 
-                    if (namesList.get(i).equals("switch")) {
+
+                        TableLayout mainTable = findViewById(R.id.tableLayout);
+                        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
                         TableRow tableRow = new TableRow(this);
                         tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
-
+                        if (i % 2 == 0) {
+                            tableRow.setBackgroundColor(Color.GRAY);
+                        }
+                        else {
+                            tableRow.setBackgroundColor(Color.LTGRAY);
+                        }
                         TextView textView = new TextView(this);
                         textView.setLayoutParams(rowParams);// TableRow is the parent view
-                        JSONArray arrayData = obj.getJSONArray("switch");
-                        List<String> namesSwitch = new ArrayList<>();
-                        for (int j = 0; j < arrayData.length(); j++) {
-                            JSONObject switchObj = arrayData.getJSONObject(j);
-                            if (j == 0) {
-                                stringIterator = switchObj.keys();
-                                while (stringIterator.hasNext()) {
-                                    namesSwitch.add(stringIterator.next());
-                                }
-                            }
+                        for (int k = 0; k < namesList.size(); k++) {
+                            System.out.println(namesList.get(k));
+                        }
 
-                            //todo CREAR UN NUEVO COMPONENTE PARA EL MOVIL
+                        if (namesList.get(j).equals("switch")) {
 
-
-                            //tableRow.addView(textView);
-                            ToggleButton tb = new ToggleButton(this);
-                            tb.setId((Integer) switchObj.get(namesSwitch.get(2)));
-                            Boolean activated = true;
-
-
-                            tb.setTextOff("OFF");
-                            //System.out.println(namesSwitch.get(2));
-                            tb.setTextOn((CharSequence) switchObj.get(namesSwitch.get(1)));
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        if (switchObj.get(namesSwitch.get(0)) == activated) {
-                                            tb.setChecked(true);
-                                        } else {
-                                            tb.setChecked(false);
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
+                            JSONArray arrayData = blockObject.getJSONArray("switch");
+                            List<String> namesSwitch = new ArrayList<>();
+                            for (int x = 0; x < arrayData.length(); x++) {
+                                JSONObject switchObj = arrayData.getJSONObject(x);
+                                if (x == 0) {
+                                    stringIterator = switchObj.keys();
+                                    while (stringIterator.hasNext()) {
+                                        namesSwitch.add(stringIterator.next());
                                     }
+                                }
 
-                                    tb.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            // TODO TEST MORE
-                                            try {
-                                                switchObj.put("default",tb.isChecked());
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
+                                //todo CREAR UN NUEVO COMPONENTE PARA EL MOVIL
+
+
+                                //tableRow.addView(textView);
+                                ToggleButton tb = new ToggleButton(this);
+                                tb.setId((Integer) switchObj.get(namesSwitch.get(2)));
+                                Boolean activated = true;
+
+
+                                tb.setTextOff("OFF");
+                                //System.out.println(namesSwitch.get(2));
+                                tb.setTextOn((CharSequence) switchObj.get(namesSwitch.get(1)));
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            if (switchObj.get(namesSwitch.get(0)) == activated) {
+                                                tb.setChecked(true);
+                                            } else {
+                                                tb.setChecked(false);
                                             }
-                                            System.out.println(switchObj);
-
-                                            cc.send(jsonToBytes(switchObj));
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
-                                    });
 
-                                    tableRow.addView(tb);
-                                    mainTable.addView(tableRow);
-                                    // Stuff that updates the UI
+                                        tb.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                // TODO TEST MORE
+                                                try {
+                                                    switchObj.put("default", tb.isChecked());
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                System.out.println(switchObj);
 
-                                }
-                            });
+                                                cc.send(jsonToBytes(switchObj));
+                                            }
+                                        });
+
+                                        tableRow.addView(tb);
+                                        mainTable.addView(tableRow);
+                                        // Stuff that updates the UI
+
+                                    }
+                                });
 
 
-                            //Slider sld = new Slider(this,);
+                                //Slider sld = new Slider(this,);
 
-                        }
-                    } else if (namesList.get(i).equals("slider")) {
-                        TableRow tableRow = new TableRow(this);
-                        mainTable.removeView(tableRow);
-                        tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
-
-                        TextView textView = new TextView(this);
-                        textView.setLayoutParams(rowParams);// TableRow is the parent view
-                        JSONArray arrayData = obj.getJSONArray("slider");
-                        List<String> namesSlider = new ArrayList<>();
-                        for (int j = 0; j < arrayData.length(); j++) {
-                            JSONObject sliderObj = arrayData.getJSONObject(j);
-                            if (j == 0) {
-                                stringIterator = sliderObj.keys();
-                                while (stringIterator.hasNext()) {
-                                    namesSlider.add(stringIterator.next());
-                                }
                             }
-                            //tableRow.addView(textView);
-                            Slider slid = new Slider(this);
+                        } else if (namesList.get(j).equals("slider")) {
+                            /*TableRow tableRow = new TableRow(this);
+                            mainTable.removeView(tableRow);
+                            tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
 
-                            slid.setId(Integer.valueOf(String.valueOf(sliderObj.get(namesSlider.get(4)))));
-                            //Initial data
-
-                            slid.setValueFrom(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(1)))));
-                            //slid.setValueFrom(0);
-
-                            //Final data
-                            slid.setValueTo(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(2)))));
-                            //slid.setValueTo(10);
-
-                            //Setting the stepsize and the value of the slider
-                            slid.setStepSize(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(3)))));
-                            //slid.setStepSize(0.5F);
-
-                            slid.setValue(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(0)))));
-
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tableRow.addView(slid);
-                                    //tableRow.removeView((View) tableRow.getParent());
-                                    //mainTable.removeView((View) mainTable.getParent());
-                                    System.out.println(mainTable.getParent());
-                                    mainTable.removeView((View) mainTable.getParent());
-
-                                    mainTable.addView(tableRow);
-                                    // Stuff that updates the UI
-
+                            TextView textView = new TextView(this);
+                            textView.setLayoutParams(rowParams);// TableRow is the parent view*/
+                            JSONArray arrayData = blockObject.getJSONArray("slider");
+                            List<String> namesSlider = new ArrayList<>();
+                            for (int k = 0; k < arrayData.length(); k++) {
+                                JSONObject sliderObj = arrayData.getJSONObject(k);
+                                if (k == 0) {
+                                    stringIterator = sliderObj.keys();
+                                    while (stringIterator.hasNext()) {
+                                        namesSlider.add(stringIterator.next());
+                                    }
                                 }
-                            });
-                        }
+                                //tableRow.addView(textView);
+                                Slider slid = new Slider(this);
+
+                                slid.setId(Integer.valueOf(String.valueOf(sliderObj.get(namesSlider.get(4)))));
+                                //Initial data
+
+                                slid.setValueFrom(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(1)))));
+                                //slid.setValueFrom(0);
+
+                                //Final data
+                                slid.setValueTo(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(2)))));
+                                //slid.setValueTo(10);
+
+                                //Setting the stepsize and the value of the slider
+                                slid.setStepSize(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(3)))));
+                                //slid.setStepSize(0.5F);
+
+                                slid.setValue(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(0)))));
 
 
-                    } else if (namesList.get(i).equals("dropdown")) {
-                        TableRow tableRow = new TableRow(this);
-                        tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tableRow.addView(slid);
+                                        //tableRow.removeView((View) tableRow.getParent());
+                                        //mainTable.removeView((View) mainTable.getParent());
+                                        System.out.println(mainTable.getParent());
+                                        mainTable.removeView((View) mainTable.getParent());
 
-                        TextView textView = new TextView(this);
-                        textView.setLayoutParams(rowParams);// TableRow is the parent view
-                        JSONArray arrayData = obj.getJSONArray("dropdown");
-                        List<String> nameDropDown = new ArrayList<>();
+                                        mainTable.addView(tableRow);
+                                        // Stuff that updates the UI
 
-                        for (int j = 0; j < arrayData.length(); j++) {
-
-                            JSONObject dropdownObj = arrayData.getJSONObject(j);
-                            if (j == 0) {
-                                stringIterator = dropdownObj.keys();
-                                while (stringIterator.hasNext()) {
-                                    nameDropDown.add(stringIterator.next());
-                                }
+                                    }
+                                });
                             }
 
-                            Spinner dropdown = new Spinner(this);
 
-                            //Getting new data for the spinner
-                            JSONArray spinnerLabels = dropdownObj.getJSONArray("values");
-                            dropdown.setId(Integer.valueOf(String.valueOf(dropdownObj.get(nameDropDown.get(2)))));
+                        } else if (namesList.get(j).equals("dropdown")) {
+                            /*TableRow tableRow = new TableRow(this);
+                            tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
 
-                            List<String> labelIds = new ArrayList<>();
-                            List<String> labelInfo = new ArrayList<>();
+                            TextView textView = new TextView(this);
+                            textView.setLayoutParams(rowParams);// TableRow is the parent view*/
+                            JSONArray arrayData = blockObject.getJSONArray("dropdown");
+                            List<String> nameDropDown = new ArrayList<>();
 
-                            //Get LabelIds
-                            /*stringIterator = spinnerLabels.getJSONObject("values");
-                            while (stringIterator.hasNext()) {
-                                labelIds.add(stringIterator.next());
-                            }*/
+                            for (int k = 0; k < arrayData.length(); k++) {
 
-                            for (int k = 0; k < spinnerLabels.length(); k++) {
-                                JSONObject label = spinnerLabels.getJSONObject(k);
-                                stringIterator = label.keys();
+                                JSONObject dropdownObj = arrayData.getJSONObject(k);
+                                if (k == 0) {
+                                    stringIterator = dropdownObj.keys();
+                                    while (stringIterator.hasNext()) {
+                                        nameDropDown.add(stringIterator.next());
+                                    }
+                                }
+
+                                Spinner dropdown = new Spinner(this);
+
+                                //Getting new data for the spinner
+                                JSONArray spinnerLabels = dropdownObj.getJSONArray("values");
+                                dropdown.setId(Integer.valueOf(String.valueOf(dropdownObj.get(nameDropDown.get(2)))));
+
+                                List<String> labelIds = new ArrayList<>();
+                                List<String> labelInfo = new ArrayList<>();
+
+                                //Get LabelIds
+                                /*stringIterator = spinnerLabels.getJSONObject("values");
                                 while (stringIterator.hasNext()) {
                                     labelIds.add(stringIterator.next());
-                                    labelInfo.add((String) label.get((labelIds.get(k))));
+                                }*/
 
+                                for (int x = 0; x < spinnerLabels.length(); x++) {
+                                    JSONObject label = spinnerLabels.getJSONObject(x);
+                                    stringIterator = label.keys();
+                                    while (stringIterator.hasNext()) {
+                                        labelIds.add(stringIterator.next());
+                                        labelInfo.add((String) label.get((labelIds.get(x))));
+
+                                    }
                                 }
+
+                                //Get the actual labels to create the array
+                                /*for (int k = 0; k < labelIds.size(); k++) {
+                                    labelInfo.add((String) spinnerLabels.get(labelIds.get(k)));
+                                }*/
+                                String[] spinnerOpt = labelInfo.toArray(new String[0]);
+                                ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                                        android.R.layout.simple_spinner_item, spinnerOpt);
+                                adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+                                dropdown.setAdapter(adapter);
+                                //todo Para conseguir la posicion por defecto, tendiramos que recorrer otra vez el objeto
+                                //todo para buscar la posicion exacta en la que se encuentra el objeto y luego indicarle eso al setSelection
+                                //dropdown.setSelection();
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tableRow.addView(dropdown);
+                                        mainTable.addView(tableRow);
+                                        // Stuff that updates the UI
+
+                                    }
+                                });
                             }
+                        } else if (namesList.get(j).equals("sensor")) {
+                            /*TableRow tableRow = new TableRow(this);
+                            tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
 
-                            //Get the actual labels to create the array
-                            /*for (int k = 0; k < labelIds.size(); k++) {
-                                labelInfo.add((String) spinnerLabels.get(labelIds.get(k)));
-                            }*/
-                            String[] spinnerOpt = labelInfo.toArray(new String[0]);
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                                    android.R.layout.simple_spinner_item, spinnerOpt);
-                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-                            dropdown.setAdapter(adapter);
-                            //todo Para conseguir la posicion por defecto, tendiramos que recorrer otra vez el objeto
-                            //todo para buscar la posicion exacta en la que se encuentra el objeto y luego indicarle eso al setSelection
-                            //dropdown.setSelection();
+                            TextView textView = new TextView(this);
+                            textView.setLayoutParams(rowParams);// TableRow is the parent view*/
+                            JSONArray arrayData = blockObject.getJSONArray("sensor");
+                            List<String> namesSensor = new ArrayList<>();
 
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tableRow.addView(dropdown);
-                                    mainTable.addView(tableRow);
-                                    // Stuff that updates the UI
-
+                            for (int k = 0; k < arrayData.length(); k++) {
+                                JSONObject sensorObj = arrayData.getJSONObject(k);
+                                if (k == 0) {
+                                    stringIterator = sensorObj.keys();
+                                    while (stringIterator.hasNext()) {
+                                        namesSensor.add(stringIterator.next());
+                                    }
                                 }
-                            });
-                        }
-                    } else if (namesList.get(i).equals("sensor")) {
-                        TableRow tableRow = new TableRow(this);
-                        tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
+                                //tableRow.addView(textView);
+                                TextView sensorText = new TextView(this);
+                                //Adding basic information to the TextView that will be shown
+                                sensorText.setText((CharSequence) sensorObj.get(namesSensor.get(2)));
+                                sensorText.setId(Integer.valueOf(String.valueOf(sensorObj.get(namesSensor.get(1)))));
+                                sensorText.append("\n" + "Threshhold Low: ");
+                                sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(3))));
+                                sensorText.append("\n" + "Threshold High: ");
+                                sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(0))));
 
-                        TextView textView = new TextView(this);
-                        textView.setLayoutParams(rowParams);// TableRow is the parent view
-                        JSONArray arrayData = obj.getJSONArray("sensor");
-                        List<String> namesSensor = new ArrayList<>();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tableRow.addView(sensorText);
+                                        mainTable.addView(tableRow);
+                                        // Stuff that updates the UI
 
-                        for (int j = 0; j < arrayData.length(); j++) {
-                            JSONObject sensorObj = arrayData.getJSONObject(j);
-                            if (j == 0) {
-                                stringIterator = sensorObj.keys();
-                                while (stringIterator.hasNext()) {
-                                    namesSensor.add(stringIterator.next());
-                                }
+                                    }
+                                });
+
                             }
-                            //tableRow.addView(textView);
-                            TextView sensorText = new TextView(this);
-                            //Adding basic information to the TextView that will be shown
-                            sensorText.setText((CharSequence) sensorObj.get(namesSensor.get(2)));
-                            sensorText.setId(Integer.valueOf(String.valueOf(sensorObj.get(namesSensor.get(1)))));
-                            sensorText.append("\n" + "Threshhold Low: ");
-                            sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(3))));
-                            sensorText.append("\n" + "Threshold High: ");
-                            sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(0))));
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tableRow.addView(sensorText);
-                                    mainTable.addView(tableRow);
-                                    // Stuff that updates the UI
-
-                                }
-                            });
-
                         }
                     }
             }
