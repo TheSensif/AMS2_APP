@@ -1,9 +1,11 @@
 package com.example.app_projecte1;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import android.content.Intent;
@@ -44,17 +47,22 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
     private WebSocketClient cc;
     private JSONObject json=new JSONObject();
     private boolean messageSended = false;
+
+    private HashMap<String,Slider> componentsSlider=new HashMap<>();
+    private HashMap<String,Spinner> componentsDropdown=new HashMap<>();
+    private HashMap<String,ToggleButton> componentsSwitch=new HashMap<>();
+    private HashMap<String,TextView> componentsSensor=new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ieti_industry);
-        ArrayList<String> components = new ArrayList<>();
         //get the values passed :
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -62,6 +70,8 @@ public class ieti_industry extends AppCompatActivity {
              password = extras.getString("password");
              ip = extras.getString("ip");
         }
+
+
         // connection block:
         try {
 
@@ -77,6 +87,11 @@ public class ieti_industry extends AppCompatActivity {
 
                         Log.i("i","Taking the OK USER");
                         cc.send("requestConfiguration");
+
+                    } else if(message.equalsIgnoreCase("restart")){
+
+                        Log.i("i","Restart all");
+                        messageSended=false;
 
                     }
                 }
@@ -107,12 +122,34 @@ public class ieti_industry extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }else{
-                        // TODO put here the value changer
+                        // TODO put here the value changer ----------------------------------------------------------------------------------
                         String temp=bytesToObject(message);
 
                         try {
                             json=new JSONObject(temp);
                             System.out.println(json);
+                            if(json.getString("component").equalsIgnoreCase("slider")){
+
+                                Slider s =componentsSlider.get(json.getString("id"));
+
+                                s.setValue(Integer.valueOf(json.getString("value")));
+
+                            } else if(json.getString("component").equalsIgnoreCase("switch")){
+                                ToggleButton t =componentsSwitch.get(json.getString("id"));
+                                t.setChecked(Boolean.valueOf(json.getString("value")));
+                            } else if(json.getString("component").equalsIgnoreCase("dropdown")){
+                                System.out.println("dropdown");
+                                Spinner d =componentsDropdown.get(json.getString("id"));
+                                System.out.println(d.getSelectedItem());
+                                System.out.println(json.getInt("value"));
+                                d.setSelection(json.getInt("value"),true);
+
+                            } else if(json.getString("component").equalsIgnoreCase("sensor")){
+                                TextView s =componentsSensor.get(json.getString("id"));
+                                s.setText(json.getString("value"));
+                            }
+
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -195,12 +232,14 @@ public class ieti_industry extends AppCompatActivity {
                                 }
                             }
 
+
                             //todo CREAR UN NUEVO COMPONENTE PARA EL MOVIL
 
 
                             //tableRow.addView(textView);
                             ToggleButton tb = new ToggleButton(this);
-                            tb.setId((Integer) switchObj.get(namesSwitch.get(2)));
+                            //tb.setId((Integer) switchObj.get(namesSwitch.get(2)));
+                            tb.setTag(switchObj.get(namesSwitch.get(2)));
                             Boolean activated = true;
 
 
@@ -224,18 +263,23 @@ public class ieti_industry extends AppCompatActivity {
                                     tb.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            // TODO TEST MORE
+                                            // TODO TEST MORE AND DO THE SAME WITH OTHER COMPONENTS
                                             try {
-                                                switchObj.put("default",tb.isChecked());
+                                                switchObj.put("value",tb.isChecked());
+                                                switchObj.put("component","switch");
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
                                             System.out.println(switchObj);
-
+                                            Log.i("info","SEND NEW VALUE");
                                             cc.send(jsonToBytes(switchObj));
                                         }
                                     });
-
+                                    try {
+                                        componentsSwitch.put(String.valueOf(switchObj.getString("id")),tb);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                     tableRow.addView(tb);
                                     mainTable.addView(tableRow);
                                     // Stuff that updates the UI
@@ -267,7 +311,8 @@ public class ieti_industry extends AppCompatActivity {
                             //tableRow.addView(textView);
                             Slider slid = new Slider(this);
 
-                            slid.setId(Integer.valueOf(String.valueOf(sliderObj.get(namesSlider.get(4)))));
+                            //slid.setId(Integer.valueOf(String.valueOf(sliderObj.get(namesSlider.get(4)))));
+                            slid.setTag(String.valueOf(sliderObj.get(namesSlider.get(4))));
                             //Initial data
 
                             slid.setValueFrom(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(1)))));
@@ -283,10 +328,24 @@ public class ieti_industry extends AppCompatActivity {
 
                             slid.setValue(Float.valueOf(String.valueOf(sliderObj.get(namesSlider.get(0)))));
 
+                            componentsSlider.put(String.valueOf(sliderObj.getString("id")),slid);
 
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    slid.addOnChangeListener(new Slider.OnChangeListener() {
+                                        @Override
+                                        public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                                            try {
+                                                sliderObj.put("value",value);
+                                                sliderObj.put("component","slider");
+                                                cc.send(jsonToBytes(sliderObj));
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    });
                                     tableRow.addView(slid);
                                     //tableRow.removeView((View) tableRow.getParent());
                                     //mainTable.removeView((View) mainTable.getParent());
@@ -324,7 +383,8 @@ public class ieti_industry extends AppCompatActivity {
 
                             //Getting new data for the spinner
                             JSONArray spinnerLabels = dropdownObj.getJSONArray("values");
-                            dropdown.setId(Integer.valueOf(String.valueOf(dropdownObj.get(nameDropDown.get(2)))));
+                            //dropdown.setId(Integer.valueOf(String.valueOf(dropdownObj.get(nameDropDown.get(2)))));
+                            dropdown.setTag(String.valueOf(dropdownObj.get(nameDropDown.get(2))));
 
                             List<String> labelIds = new ArrayList<>();
                             List<String> labelInfo = new ArrayList<>();
@@ -357,10 +417,30 @@ public class ieti_industry extends AppCompatActivity {
                             //todo Para conseguir la posicion por defecto, tendiramos que recorrer otra vez el objeto
                             //todo para buscar la posicion exacta en la que se encuentra el objeto y luego indicarle eso al setSelection
                             //dropdown.setSelection();
+                            System.out.println();
 
+                            componentsDropdown.put(String.valueOf(dropdownObj.getString("id")),dropdown);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                        @Override
+                                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                            try {
+                                                dropdownObj.put("component","dropdown");
+                                                dropdownObj.put("value",dropdown.getSelectedItemPosition());
+                                                cc.send(jsonToBytes(dropdownObj));
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                        }
+                                    });
                                     tableRow.addView(dropdown);
                                     mainTable.addView(tableRow);
                                     // Stuff that updates the UI
@@ -389,12 +469,13 @@ public class ieti_industry extends AppCompatActivity {
                             TextView sensorText = new TextView(this);
                             //Adding basic information to the TextView that will be shown
                             sensorText.setText((CharSequence) sensorObj.get(namesSensor.get(2)));
-                            sensorText.setId(Integer.valueOf(String.valueOf(sensorObj.get(namesSensor.get(1)))));
+                            //sensorText.setId(Integer.valueOf(String.valueOf(sensorObj.get(namesSensor.get(1)))));
+                            sensorText.setTag(String.valueOf(sensorObj.get(namesSensor.get(1))));
                             sensorText.append("\n" + "Threshhold Low: ");
                             sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(3))));
                             sensorText.append("\n" + "Threshold High: ");
                             sensorText.append(String.valueOf(sensorObj.get(namesSensor.get(0))));
-
+                            componentsSensor.put(String.valueOf(sensorObj.getString("id")),sensorText);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
