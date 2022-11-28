@@ -15,8 +15,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-<<<<<<< HEAD
-=======
 import com.google.android.material.slider.Slider;
 
 import org.json.JSONArray;
@@ -33,7 +31,6 @@ import java.util.List;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Button;
->>>>>>> JsonImplementation
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -44,44 +41,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-<<<<<<< HEAD
-=======
 import java.io.IOException;
->>>>>>> JsonImplementation
 import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-<<<<<<< HEAD
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ToggleButton;
-=======
 import java.util.ArrayList;
 import java.util.Map;
->>>>>>> JsonImplementation
 
-import com.google.android.material.slider.Slider;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 public class ieti_industry extends AppCompatActivity {
     private String user,ip,password;
     private WebSocketClient cc;
-<<<<<<< HEAD
-    private JSONObject json;
-    ArrayList<String> components = new ArrayList<>();
-=======
     private JSONObject json=new JSONObject();
     private boolean messageSended = false;
 
@@ -89,19 +59,16 @@ public class ieti_industry extends AppCompatActivity {
     private HashMap<String,Spinner> componentsDropdown=new HashMap<>();
     private HashMap<String,ToggleButton> componentsSwitch=new HashMap<>();
     private HashMap<String,TextView> componentsSensor=new HashMap<>();
->>>>>>> JsonImplementation
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ieti_industry);
-        TableLayout mainTable = findViewById(R.id.tableLayout);
-
         //get the values passed :
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            user = extras.getString("user");
-            password = extras.getString("password");
-            ip = extras.getString("ip");
+             user = extras.getString("user");
+             password = extras.getString("password");
+             ip = extras.getString("ip");
         }
 
 
@@ -132,17 +99,6 @@ public class ieti_industry extends AppCompatActivity {
                 @Override
                 public void onMessage(ByteBuffer message){
 
-<<<<<<< HEAD
-                    Log.i("i","Taking the configuration");
-                    String temp=bytesToObject(message);
-
-                    try {
-                        json=new JSONObject(temp);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    Log.i("infoJson", String.valueOf(json));
-=======
                     if(messageSended==false){
                         Log.i("i","Taking the configuration");
                         String temp=bytesToObject(message);
@@ -199,7 +155,6 @@ public class ieti_industry extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
->>>>>>> JsonImplementation
                 }
 
                 @Override
@@ -239,165 +194,16 @@ public class ieti_industry extends AppCompatActivity {
             }
         });
 
-<<<<<<< HEAD
-        try {
-            JSONObject obj = json;
-            System.out.println(obj);
-            int quantityElements = obj.length();
-=======
 
 
     }
     public void prueba() {
         try {
->>>>>>> JsonImplementation
 
             JSONObject obj = json;
                 System.out.println(obj);
                 int quantityElements = obj.length();
 
-<<<<<<< HEAD
-                TableRow tableRow = new TableRow(this);
-                tableRow.setLayoutParams(mainTable.getLayoutParams());// TableLayout is the parent view
-
-                TextView textView = new TextView(this);
-                textView.setLayoutParams(rowParams);// TableRow is the parent view
-                if (namesList.get(i).equals("switch")) {
-                    JSONArray arrayData = obj.getJSONArray("switch");
-                    System.out.println(arrayData.length());
-                    List<String> namesSwitch = new ArrayList<>();
-
-                    for (int j = 0; j < arrayData.length(); j++) {
-                        System.out.println(arrayData.get(j));
-                        JSONObject switchObj = arrayData.getJSONObject(j);
-                        if (j==0) {
-                            stringIterator = switchObj.keys();
-                            while (stringIterator.hasNext()) {
-                                namesSwitch.add(stringIterator.next());
-                            }
-                        }
-
-                        //tableRow.addView(textView);
-                        ToggleButton tb = new ToggleButton(this);
-                        tb.setId(Integer.valueOf((String) switchObj.get(namesSwitch.get(0))));
-                        if (switchObj.get(namesSwitch.get(2)).equals("on")) {
-                            tb.setChecked(true);
-                        } else {
-                            tb.setChecked(false);
-                        }
-                        tb.setTextOff("OFF");
-                        System.out.println(namesSwitch.get(2));
-                        tb.setTextOn((CharSequence) switchObj.get(namesSwitch.get(2)));
-
-                        tableRow.addView(tb);
-                        mainTable.addView(tableRow);
-                        //Slider sld = new Slider(this,);
-
-                    }
-                } else if (namesList.get(i).equals("slider")) {
-                    JSONArray arrayData = obj.getJSONArray("slider");
-                    List<String> namesSlider = new ArrayList<>();
-                    for (int j = 0; j < arrayData.length(); j++) {
-                        JSONObject sliderObj = arrayData.getJSONObject(j);
-                        if (j == 0) {
-                            stringIterator = sliderObj.keys();
-                            while (stringIterator.hasNext()) {
-                                namesSlider.add(stringIterator.next());
-                            }
-                        }
-                        //tableRow.addView(textView);
-                        Slider slid = new Slider(this);
-
-                        slid.setId(Integer.valueOf((String) sliderObj.get(namesSlider.get(0))));
-
-                        System.out.println(sliderObj.get(namesSlider.get(1)));
-                        //Getting the value
-                        Float val = Float.valueOf((String) sliderObj.get(namesSlider.get(1)));
-                        //Initial data
-                        slid.setValueFrom(Float.valueOf((String) sliderObj.get(namesSlider.get(2))));
-                        //Final data
-                        slid.setValueTo(Float.valueOf((String) sliderObj.get(namesSlider.get(3))));
-                        //Setting the stepsize and the value of the slider
-                        slid.setStepSize(Float.valueOf((String) sliderObj.get(namesSlider.get(4))));
-                        slid.setValue(val);
-
-                        tableRow.addView(slid);
-                        mainTable.addView(tableRow);
-                    }
-
-
-                }else if (namesList.get(i).equals("dropdown")) {
-                    JSONArray arrayData = obj.getJSONArray("dropdown");
-                    List<String> nameDropDown = new ArrayList<>();
-
-                    for (int j = 0; j < arrayData.length(); j++) {
-
-                        JSONObject dropdownObj = arrayData.getJSONObject(j);
-                        if (j == 0) {
-                            stringIterator = dropdownObj.keys();
-                            while (stringIterator.hasNext()) {
-                                nameDropDown.add(stringIterator.next());
-                            }
-                        }
-
-                        Spinner dropdown = new Spinner(this);
-
-                        //Getting new data for the spinner
-                        JSONObject spinnerLabels = dropdownObj.getJSONObject(nameDropDown.get(3));
-                        System.out.println(spinnerLabels);
-                        List<String> labelIds = new ArrayList<>();
-                        //Get LabelIds
-                        stringIterator = spinnerLabels.keys();
-                        while (stringIterator.hasNext()) {
-                            labelIds.add(stringIterator.next());
-                        }
-
-                        System.out.println(labelIds.size());
-                        //Get the actual labels to create the array
-                        List<String> labelInfo = new ArrayList<>();
-                        for (int k = 0; k < labelIds.size(); k++) {
-                            labelInfo.add((String) spinnerLabels.get(labelIds.get(k)));
-                        }
-                        String[] spinnerOpt = labelInfo.toArray(new String[0]);
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                                android.R.layout.simple_spinner_item, spinnerOpt);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-                        dropdown.setAdapter(adapter);
-                        //todo Para conseguir la posicion por defecto, tendiramos que recorrer otra vez el objeto
-                        //todo para buscar la posicion exacta en la que se encuentra el objeto y luego indicarle eso al setSelection
-                        //dropdown.setSelection();
-
-                        tableRow.addView(dropdown);
-                        mainTable.addView(tableRow);
-                    }
-                }else if (namesList.get(i).equals("sensor")) {
-                    JSONArray arrayData = obj.getJSONArray("sensor");
-                    List<String> namesSensor = new ArrayList<>();
-
-                    for (int j = 0; j < arrayData.length(); j++) {
-                        JSONObject sensorObj = arrayData.getJSONObject(j);
-                        if (j == 0) {
-                            stringIterator = sensorObj.keys();
-                            while (stringIterator.hasNext()) {
-                                namesSensor.add(stringIterator.next());
-                            }
-                        }
-                        //tableRow.addView(textView);
-                        TextView sensorText = new TextView(this);
-                        //Adding basic information to the TextView that will be shown
-                        sensorText.setText((CharSequence) sensorObj.get(namesSensor.get(1)));
-                        sensorText.setId(Integer.valueOf((String) sensorObj.get(namesSensor.get(0))));
-                        sensorText.append("\n"+"Threshhold Low: ");
-                        sensorText.append((CharSequence) sensorObj.get(namesSensor.get(2)));
-                        sensorText.append("\n"+"Threshold High: ");
-                        sensorText.append((CharSequence) sensorObj.get(namesSensor.get(3)));
-
-                        tableRow.addView(sensorText);
-                        mainTable.addView(tableRow);
-
-                    }
-                }
-=======
                 List<String> namesList = new ArrayList<>();
                 Iterator<String> stringIterator = obj.keys();
                 while (stringIterator.hasNext()) {
@@ -682,34 +488,13 @@ public class ieti_industry extends AppCompatActivity {
 
                         }
                     }
->>>>>>> JsonImplementation
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-<<<<<<< HEAD
-    /*public String loadJSONFromAsset() {
-        String json = "";
-=======
 
-    public String bytesToObject (ByteBuffer arr) {
-        String result = "error";
->>>>>>> JsonImplementation
-        try {
-            // Transforma el ByteButter en byte[]
-            byte[] bytesArray = new byte[arr.remaining()];
-            arr.get(bytesArray, 0, bytesArray.length);
-
-<<<<<<< HEAD
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return json;
-
-
-    }*/
     public String bytesToObject (ByteBuffer arr) {
         String result = "error";
         try {
@@ -717,8 +502,6 @@ public class ieti_industry extends AppCompatActivity {
             byte[] bytesArray = new byte[arr.remaining()];
             arr.get(bytesArray, 0, bytesArray.length);
 
-=======
->>>>>>> JsonImplementation
             // Transforma l'array de bytes en objecte
             ByteArrayInputStream in = new ByteArrayInputStream(bytesArray);
             ObjectInputStream is = new ObjectInputStream(in);
@@ -729,8 +512,6 @@ public class ieti_industry extends AppCompatActivity {
         } catch (IOException e) { e.printStackTrace(); }
         return result;
     }
-<<<<<<< HEAD
-=======
     public static byte[] jsonToBytes (JSONObject obj) {
         byte[] result = null;
         try {
@@ -743,14 +524,9 @@ public class ieti_industry extends AppCompatActivity {
         } catch (IOException e) { e.printStackTrace(); }
         return result;
     }
->>>>>>> JsonImplementation
 
 
 
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> JsonImplementation
 
 // TODO when create a component set onchange listener and send json with id and new value , send via byte buffer
